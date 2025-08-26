@@ -1,28 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz dos Carros</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz dos Carros – Filmes & Games</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div id="menu">
-    <h1>🚗 Quiz dos Carros 🎬🎮</h1>
-    <button id="startBtn">Iniciar</button>
-  </div>
+  <div id="app">
+    <!-- MENU -->
+    <section id="menu" class="card">
+      <h1 class="logo">🚗 Quiz dos Carros 🎬🎮</h1>
 
-  <div id="quiz" class="hidden">
-    <div id="timer">⏱ Tempo: 20</div>
-    <div id="question"></div>
-    <div id="answers"></div>
-    <button id="nextBtn" class="hidden">Próxima</button>
-  </div>
+      <div class="menu-actions">
+        <button id="startBtn" class="btn btn-primary">Iniciar</button>
+        <button id="infoBtn" class="btn btn-secondary">Informações</button>
+      </div>
 
-  <div id="result" class="hidden">
-    <h2>🏁 Resultado Final 🏁</h2>
-    <p id="scoreText"></p>
-    <button onclick="location.reload()">Jogar Novamente</button>
+      <p class="rights">Todos os direitos reservados.</p>
+    </section>
+
+    <!-- INFORMAÇÕES -->
+    <section id="info" class="card hidden">
+      <h2 class="section-title">Informações</h2>
+      <div class="info-content">
+        <p><strong>Desenvolvedores:</strong> João Vitor & Ana Clara</p>
+        <p><strong>Turma:</strong> 9º ano A</p>
+        <p><strong>Escola:</strong> Nova Jornada, Espaço Cultura</p>
+      </div>
+      <div class="menu-actions">
+        <button id="infoBackBtn" class="btn btn-secondary">Voltar</button>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="card hidden">
+      <div class="quiz-top">
+        <div id="timer" class="timer">⏱ 20</div>
+        <div id="progress" class="progress">Pergunta <span id="qIndex">1</span>/10</div>
+      </div>
+
+      <div id="mediaWrap" class="media">
+        <img id="qImage" src="" alt="Imagem da pergunta"/>
+      </div>
+
+      <div id="question" class="question"></div>
+      <div id="answers" class="answers"></div>
+
+      <div id="infoBox" class="info-box hidden"></div>
+
+      <div class="quiz-actions">
+        <button id="nextBtn" class="btn btn-primary hidden">Próxima</button>
+      </div>
+    </section>
+
+    <!-- RESULTADO -->
+    <section id="result" class="card hidden">
+      <h2 class="section-title">🏁 Resultado Final</h2>
+      <p id="scoreText" class="score-text"></p>
+      <div class="menu-actions">
+        <button id="restartBtn" class="btn btn-primary">Jogar Novamente</button>
+        <a class="btn btn-secondary" id="homeBtn" href="./">Voltar ao Início</a>
+      </div>
+    </section>
   </div>
 
   <script src="script.js"></script>
