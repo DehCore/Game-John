@@ -1,236 +1,188 @@
-// ====== ELEMENTOS ======
-const menu = document.getElementById("menu");
-const startBtn = document.getElementById("startBtn");
-const infoBtn = document.getElementById("infoBtn");
-const info = document.getElementById("info");
-const infoBackBtn = document.getElementById("infoBackBtn");
-
-const quiz = document.getElementById("quiz");
-const timerEl = document.getElementById("timer");
-const progressEl = document.getElementById("progress");
-const qIndexEl = document.getElementById("qIndex");
-const qImage = document.getElementById("qImage");
-const questionEl = document.getElementById("question");
-const answersEl = document.getElementById("answers");
-const infoBox = document.getElementById("infoBox");
-const nextBtn = document.getElementById("nextBtn");
-
-const result = document.getElementById("result");
-const scoreText = document.getElementById("scoreText");
-const restartBtn = document.getElementById("restartBtn");
-const homeBtn = document.getElementById("homeBtn");
-
-// ====== ESTADO ======
-let questions = [];
-let currentQuestionIndex = 0;
-let score = 0;
-let timeLeft = 20;
-let timer = null;
-const MAX_QUESTIONS = 10;
-
-// ====== BANCO DE PERGUNTAS ======
-// Imagens externas (placeholders com o nome do carro) + descrições curtas.
-// Você pode trocar as URLs por imagens específicas depois, se quiser.
-const ALL_QUESTIONS = [
-  {
-    image: "https://via.placeholder.com/800x450?text=DeLorean+DMC-12",
-    question: "Em 'De Volta para o Futuro', qual é o carro que vira máquina do tempo?",
-    answers: ["Pontiac Firebird", "DeLorean DMC-12", "Aston Martin DB5", "Ford Mustang"],
-    correct: 1,
-    info: "O DeLorean DMC-12, com portas asa-de-gaivota, ficou eternizado como máquina do tempo do Dr. Brown e Marty McFly."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Dodge+Charger+1970",
-    question: "Qual muscle car o Dominic Toretto usa em diversos filmes de 'Velozes e Furiosos'?",
-    answers: ["Dodge Charger 1970", "Chevrolet Camaro 1969", "Ford Mustang 1967", "Plymouth Barracuda 1971"],
-    correct: 0,
-    info: "O Dodge Charger R/T 1970 é o ícone do Toretto: V8 brutal e presença clássica dos muscle cars americanos."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Toyota+Supra+MK4",
-    question: "Qual carro laranja do Brian O'Conner ficou famoso no primeiro 'Velozes e Furiosos'?",
-    answers: ["Mazda RX-7", "Nissan Skyline R34", "Toyota Supra MK4", "Honda S2000"],
-    correct: 2,
-    info: "O Toyota Supra MK4 de Brian, com preparação pesada, virou símbolo do tuning dos anos 2000."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=BMW+M3+GTR",
-    question: "No jogo 'Need for Speed: Most Wanted' (2005), qual é o carro principal do protagonista?",
-    answers: ["BMW M3 GTR", "Mitsubishi Lancer Evo", "Subaru Impreza WRX", "Mazda RX-8"],
-    correct: 0,
-    info: "A BMW M3 GTR E46, com livery branco/azul, é uma das máquinas mais queridas pelos fãs da franquia NFS."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=KITT+Trans+Am",
-    question: "Qual modelo é o KITT, carro falante de 'Knight Rider'?",
-    answers: ["Pontiac Firebird Trans Am", "Chevrolet Corvette", "Dodge Viper", "Ford GT"],
-    correct: 0,
-    info: "KITT é um Pontiac Firebird Trans Am modificado, com tecnologia avançada e a icônica luz vermelha frontal."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Batmobile+Tumbler",
-    question: "Em 'The Dark Knight', como é chamado o Batmóvel usado por Batman?",
-    answers: ["Tumbler", "Interceptor", "Mach 5", "Speeder"],
-    correct: 0,
-    info: "O Tumbler é um Batmóvel estilo tanque, ágil e imponente, introduzido na trilogia de Christopher Nolan."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Chevrolet+Camaro+Bumblebee",
-    question: "Em 'Transformers', Bumblebee se transforma em qual carro moderno?",
-    answers: ["Chevrolet Camaro", "Dodge Challenger", "Ford Mustang", "Nissan GT-R"],
-    correct: 0,
-    info: "Bumblebee popularizou o Chevrolet Camaro moderno, aparecendo em várias gerações ao longo da franquia."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Ford+Falcon+XB+Interceptor",
-    question: "Qual é o carro Interceptor de Max em 'Mad Max'?",
-    answers: ["Ford Falcon XB", "Pontiac GTO", "Chevy Impala", "Plymouth Road Runner"],
-    correct: 0,
-    info: "O 'Pursuit Special' é um Ford Falcon XB modificado, visual bruto pós-apocalíptico, símbolo da série."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Aston+Martin+DB5",
-    question: "Qual clássico da Aston Martin é famoso pelos filmes de James Bond?",
-    answers: ["DB9", "DB11", "DB5", "Vantage"],
-    correct: 2,
-    info: "O Aston Martin DB5 virou sinônimo de 007 desde 'Goldfinger', com gadgets e elegância britânica."
-  },
-  {
-    image: "https://via.placeholder.com/800x450?text=Mini+Cooper",
-    question: "No filme 'The Italian Job' (Uma Saída de Mestre), qual carro é usado no assalto e fuga?",
-    answers: ["Audi TT", "VW Golf GTI", "Mini Cooper", "Renault Clio V6"],
-    correct: 2,
-    info: "Mini Coopers fazem as fugas coreografadas por túneis e escadas – uma vitrine de agilidade urbana."
-  }
-];
-
-// ====== UTIL ======
-function shuffle(array){
-  for(let i=array.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+/* Global */
+:root{
+  --bg1:#0f1222;
+  --bg2:#1b2141;
+  --card:#0d0f1a;
+  --accent:#ff6600;
+  --accent-2:#16c27a;
+  --danger:#dc3545;
+  --text:#e9ecff;
+  --muted:#9aa3c7;
+  --shadow: 0 10px 30px rgba(0,0,0,.45);
+  --radius: 18px;
 }
 
-function resetTimer(){
-  clearInterval(timer);
-  timeLeft = 20;
-  timerEl.textContent = `⏱ ${timeLeft}`;
-  timer = setInterval(()=>{
-    timeLeft--;
-    timerEl.textContent = `⏱ ${timeLeft}`;
-    if(timeLeft <= 0){
-      clearInterval(timer);
-      lockAnswers(-1); // estourou o tempo (conta como errada)
-    }
-  },1000);
+*{ box-sizing:border-box; }
+
+html,body{
+  height:100%;
+  margin:0;
+  background: radial-gradient(1200px 900px at 50% 40%, var(--bg2), var(--bg1));
+  color: var(--text);
+  font-family: 'Montserrat', system-ui, -apple-system, Arial, sans-serif;
 }
 
-function clearNode(node){
-  while(node.firstChild) node.removeChild(node.firstChild);
+#app{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
 }
 
-// ====== FLUXO ======
-function startGame(){
-  // Seleciona e embaralha 10
-  const pool = [...ALL_QUESTIONS];
-  shuffle(pool);
-  questions = pool.slice(0, MAX_QUESTIONS);
-  currentQuestionIndex = 0;
-  score = 0;
-
-  menu.classList.add("hidden");
-  info.classList.add("hidden");
-  result.classList.add("hidden");
-  quiz.classList.remove("hidden");
-  infoBox.classList.add("hidden");
-  nextBtn.classList.add("hidden");
-
-  renderQuestion();
+/* Cards / Sections */
+.card{
+  width: 100%;
+  max-width: 720px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  backdrop-filter: blur(6px);
 }
 
-function renderQuestion(){
-  clearInterval(timer);
-  infoBox.classList.add("hidden");
-  nextBtn.classList.add("hidden");
-  clearNode(answersEl);
+.hidden{ display:none; }
 
-  const q = questions[currentQuestionIndex];
-  qIndexEl.textContent = (currentQuestionIndex+1).toString();
-  qImage.src = q.image;
-  qImage.alt = "Imagem da pergunta";
-  questionEl.textContent = q.question;
-
-  q.answers.forEach((txt, idx)=>{
-    const btn = document.createElement("button");
-    btn.className = "answer";
-    btn.textContent = txt;
-    btn.addEventListener("click", ()=>handleAnswer(idx));
-    answersEl.appendChild(btn);
-  });
-
-  resetTimer();
+/* Titles */
+.logo{
+  font-family: 'Orbitron', sans-serif;
+  font-weight:700;
+  letter-spacing: .5px;
+  text-align:center;
+  margin: 8px 0 16px;
 }
 
-function handleAnswer(index){
-  clearInterval(timer);
-  lockAnswers(index);
+.section-title{
+  font-family: 'Orbitron', sans-serif;
+  font-weight:700;
+  text-align:center;
+  margin: 8px 0 20px;
 }
 
-function lockAnswers(selectedIndex){
-  const q = questions[currentQuestionIndex];
-  const buttons = answersEl.querySelectorAll(".answer");
-
-  buttons.forEach((btn, i)=>{
-    // pinta a correta
-    if(i === q.correct) btn.classList.add("correct");
-    // pinta a errada escolhida
-    if(selectedIndex === i && i !== q.correct) btn.classList.add("wrong");
-    btn.disabled = true;
-  });
-
-  if(selectedIndex === q.correct){
-    score++;
-    // mostra info apenas quando acerta
-    infoBox.textContent = q.info;
-    infoBox.classList.remove("hidden");
-  }
-
-  nextBtn.classList.remove("hidden");
+/* Menu */
+.menu-actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin: 8px 0 8px;
 }
 
-function nextQuestion(){
-  currentQuestionIndex++;
-  if(currentQuestionIndex < questions.length){
-    renderQuestion();
-  }else{
-    endGame();
-  }
+.rights{
+  text-align:center;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
-function endGame(){
-  quiz.classList.add("hidden");
-  result.classList.remove("hidden");
-  scoreText.textContent = `Você acertou ${score} de ${questions.length} perguntas!`;
+/* Buttons */
+.btn{
+  border:none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor:pointer;
+  font-weight:700;
+  letter-spacing:.3px;
+  transition: transform .06s ease, opacity .2s ease, filter .2s ease;
+  font-family: 'Orbitron', sans-serif;
 }
 
-// ====== NAVEGAÇÃO ======
-startBtn.addEventListener("click", startGame);
+.btn:active{ transform: translateY(1px) scale(.99); }
 
-infoBtn.addEventListener("click", ()=>{
-  menu.classList.add("hidden");
-  info.classList.remove("hidden");
-});
+.btn-primary{ background: var(--accent); color:#fff; }
+.btn-primary:hover{ filter:brightness(1.05); }
 
-infoBackBtn.addEventListener("click", ()=>{
-  info.classList.add("hidden");
-  menu.classList.remove("hidden");
-});
+.btn-secondary{ background: #2c3158; color:#fff; }
+.btn-secondary:hover{ filter:brightness(1.05); }
 
-nextBtn.addEventListener("click", nextQuestion);
+/* Info */
+.info-content{
+  background: rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.06);
+  padding:16px;
+  border-radius:12px;
+  line-height:1.5;
+  color:#d9defa;
+}
 
-restartBtn.addEventListener("click", ()=>{
-  // reembaralha e recomeça
-  startGame();
-});
+/* Quiz */
+.quiz-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.timer{
+  font-family:'Orbitron', sans-serif;
+  font-weight:700;
+  background:#2a2f57;
+  border:1px solid rgba(255,255,255,.08);
+  padding:8px 12px;
+  border-radius:10px;
+}
+
+.progress{
+  color: var(--muted);
+  font-weight:600;
+}
+
+.question{
+  font-size:1.25rem;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.answers{
+  display:grid;
+  gap:10px;
+}
+
+.answers .answer{
+  width:100%;
+  text-align:left;
+  background:#151935;
+  border:1px solid rgba(255,255,255,.08);
+  color:#e9ecff;
+  padding:12px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  transition: background .2s ease, transform .06s ease;
+  font-weight:600;
+}
+.answers .answer:hover{ background:#1a1f44; }
+.answers .answer:active{ transform: translateY(1px); }
+
+.correct{ background: #174a36 !important; border-color: #1e8b61 !important; }
+.wrong{ background: #3b1320 !important; border-color: #a03145 !important; }
+
+.answers .answer[disabled]{ opacity:.8; cursor:not-allowed; }
+
+.info-box{
+  margin-top:14px;
+  background: rgba(22,194,122,.08);
+  border:1px solid rgba(22,194,122,.35);
+  color:#c9ffe8;
+  padding:12px;
+  border-radius:10px;
+  line-height:1.45;
+}
+
+.quiz-actions{
+  margin-top:14px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+/* Result */
+.score-text{
+  font-size:1.15rem;
+  text-align:center;
+}
+
+/* Responsivo pequeno */
+@media (max-width:420px){
+  .question{ font-size:1.1rem; }
+  .btn{ padding:11px 16px; }
+}
