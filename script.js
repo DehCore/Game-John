@@ -25,67 +25,70 @@ let timeLeft = 20;
 let timer = null;
 const MAX_QUESTIONS = 10;
 
-// ====== PERGUNTAS (sem imagens) ======
+// ====== PERGUNTAS (5 filmes + 5 desenhos) ======
 const ALL_QUESTIONS = [
+  // FILMES
   {
     question: "Em 'De Volta para o Futuro', qual é o carro que vira máquina do tempo?",
     answers: ["Pontiac Firebird", "DeLorean DMC-12", "Aston Martin DB5", "Ford Mustang"],
     correct: 1,
-    info: "O DeLorean DMC-12, com portas asa-de-gaivota, virou a máquina do tempo do Dr. Brown e do Marty."
+    info: "O DeLorean DMC-12 ficou eternizado como máquina do tempo de Marty e Dr. Brown."
   },
   {
-    question: "Qual muscle car o Dominic Toretto usa em vários filmes de 'Velozes e Furiosos'?",
-    answers: ["Dodge Charger 1970", "Chevrolet Camaro 1969", "Ford Mustang 1967", "Plymouth Barracuda 1971"],
+    question: "Qual muscle car é o mais famoso do Dominic Toretto em 'Velozes e Furiosos'?",
+    answers: ["Chevrolet Camaro 1969", "Dodge Charger 1970", "Ford Mustang 1967", "Nissan Skyline R34"],
+    correct: 1,
+    info: "O Dodge Charger R/T 1970 é o carro símbolo de Toretto."
+  },
+  {
+    question: "No filme 'Transformers', Bumblebee é qual carro moderno?",
+    answers: ["Chevrolet Camaro", "Ford Mustang", "Toyota Supra", "Mazda RX-7"],
     correct: 0,
-    info: "O Dodge Charger R/T 1970 é o clássico do Toretto: V8 nervoso e visual icônico."
+    info: "Bumblebee foi representado como um Chevrolet Camaro nas adaptações mais recentes."
   },
   {
-    question: "Qual carro laranja do Brian O'Conner ficou famoso no primeiro 'Velozes e Furiosos'?",
-    answers: ["Mazda RX-7", "Nissan Skyline R34", "Toyota Supra MK4", "Honda S2000"],
-    correct: 2,
-    info: "O Toyota Supra MK4 de Brian marcou a era do tuning dos anos 2000."
+    question: "Qual clássico carro britânico aparece em vários filmes do James Bond?",
+    answers: ["Jaguar E-Type", "Aston Martin DB5", "Rolls-Royce Phantom", "Bentley Continental"],
+    correct: 1,
+    info: "O Aston Martin DB5 virou sinônimo de 007 desde 'Goldfinger'."
   },
   {
-    question: "No jogo 'Need for Speed: Most Wanted' (2005), qual é o carro principal do protagonista?",
-    answers: ["BMW M3 GTR", "Mitsubishi Lancer Evo", "Subaru Impreza WRX", "Mazda RX-8"],
+    question: "Em 'Mad Max', qual é o carro Interceptor do protagonista?",
+    answers: ["Pontiac GTO", "Ford Falcon XB", "Chevy Impala", "Dodge Challenger"],
+    correct: 1,
+    info: "O Ford Falcon XB modificado é o lendário Interceptor do Mad Max."
+  },
+
+  // DESENHOS / ANIMAÇÕES
+  {
+    question: "Qual é o nome do protagonista carro de 'Carros' (Pixar)?",
+    answers: ["Mate", "Relâmpago McQueen", "Doc Hudson", "Sally Carrera"],
+    correct: 1,
+    info: "Relâmpago McQueen é o astro corredor vermelho da franquia 'Carros'."
+  },
+  {
+    question: "No desenho 'Corrida Maluca', qual é o vilão principal?",
+    answers: ["Dick Vigarista", "Professor Aéreo", "Barão Vermelho", "Capitão Caverna"],
     correct: 0,
-    info: "A BMW M3 GTR E46 com livery branco/azul é um dos carros mais amados da franquia."
+    info: "Dick Vigarista e seu cachorro Mutley sempre tentam trapacear nas corridas."
   },
   {
-    question: "Qual modelo é o KITT, o carro falante de 'Knight Rider'?",
-    answers: ["Pontiac Firebird Trans Am", "Chevrolet Corvette", "Dodge Viper", "Ford GT"],
+    question: "Qual é o carro do Speed Racer?",
+    answers: ["Mach 5", "Batmóvel", "Thunderbird", "Hot Rod"],
     correct: 0,
-    info: "O KITT é um Pontiac Firebird Trans Am modificado, com alta tecnologia e a luz vermelha frontal."
+    info: "O Mach 5 é o icônico carro branco cheio de gadgets do Speed Racer."
   },
   {
-    question: "Em 'The Dark Knight', como é chamado o Batmóvel usado pelo Batman?",
-    answers: ["Tumbler", "Interceptor", "Mach 5", "Speeder"],
+    question: "Nos desenhos da Turma da Mônica, qual personagem adora carros e velocidade?",
+    answers: ["Cebolinha", "Cascão", "Anjinho", "Franjinha"],
+    correct: 3,
+    info: "Franjinha é o cientista que inventa coisas, incluindo carros malucos."
+  },
+  {
+    question: "Em 'Hot Wheels Battle Force 5', quem é o líder da equipe?",
+    answers: ["Vert Wheeler", "Sherman Cortez", "Zoom Takazumi", "Agura Ibaden"],
     correct: 0,
-    info: "O Tumbler é um Batmóvel estilo tanque, rápido e resistente, da trilogia do Nolan."
-  },
-  {
-    question: "Em 'Transformers', Bumblebee se transforma em qual carro moderno?",
-    answers: ["Chevrolet Camaro", "Dodge Challenger", "Ford Mustang", "Nissan GT-R"],
-    correct: 0,
-    info: "O Bumblebee popularizou o Camaro moderno, aparecendo em várias gerações."
-  },
-  {
-    question: "Qual é o carro Interceptor do Max em 'Mad Max'?",
-    answers: ["Ford Falcon XB", "Pontiac GTO", "Chevy Impala", "Plymouth Road Runner"],
-    correct: 0,
-    info: "O 'Pursuit Special' é um Ford Falcon XB modificado, símbolo do mundo pós-apocalíptico."
-  },
-  {
-    question: "Qual clássico da Aston Martin é famoso nos filmes de James Bond?",
-    answers: ["DB9", "DB11", "DB5", "Vantage"],
-    correct: 2,
-    info: "O Aston Martin DB5 ficou eternizado desde 'Goldfinger' pela elegância e gadgets."
-  },
-  {
-    question: "No filme 'The Italian Job' (Uma Saída de Mestre), qual carro é usado na fuga?",
-    answers: ["Audi TT", "VW Golf GTI", "Mini Cooper", "Renault Clio V6"],
-    correct: 2,
-    info: "Os Mini Coopers fazem fugas coreografadas por túneis e escadas, mostrando agilidade urbana."
+    info: "Vert Wheeler é o piloto principal da série 'Hot Wheels Battle Force 5'."
   }
 ];
 
@@ -107,7 +110,7 @@ function resetTimer(){
     timerEl.textContent = `⏱ ${timeLeft}`;
     if(timeLeft <= 0){
       clearInterval(timer);
-      lockAnswers(-1); // estourou o tempo
+      lockAnswers(-1);
     }
   },1000);
 }
