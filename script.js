@@ -1,150 +1,232 @@
-const startBtn = document.getElementById("startBtn");
+// ====== ELEMENTOS ======
 const menu = document.getElementById("menu");
+const startBtn = document.getElementById("startBtn");
+const infoBtn = document.getElementById("infoBtn");
+const info = document.getElementById("info");
+const infoBackBtn = document.getElementById("infoBackBtn");
+
 const quiz = document.getElementById("quiz");
-const questionElement = document.getElementById("question");
-const answersElement = document.getElementById("answers");
+const timerEl = document.getElementById("timer");
+const progressEl = document.getElementById("progress");
+const qIndexEl = document.getElementById("qIndex");
+const qImage = document.getElementById("qImage");
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const infoBox = document.getElementById("infoBox");
 const nextBtn = document.getElementById("nextBtn");
+
 const result = document.getElementById("result");
 const scoreText = document.getElementById("scoreText");
-const timerElement = document.getElementById("timer");
+const restartBtn = document.getElementById("restartBtn");
+const homeBtn = document.getElementById("homeBtn");
 
-let currentQuestion = 0;
+// ====== ESTADO ======
+let questions = [];
+let currentQuestionIndex = 0;
 let score = 0;
 let timeLeft = 20;
-let timer;
+let timer = null;
+const MAX_QUESTIONS = 10;
 
-const questions = [
+// Helper para gerar URLs estáveis do Unsplash Source (carrega SEMPRE uma imagem)
+const U = (q) => `https://source.unsplash.com/featured/800x450/?${encodeURIComponent(q)}`;
+
+// ====== BANCO DE PERGUNTAS (com imagens externas funcionais) ======
+const ALL_QUESTIONS = [
   {
-    question: "Qual carro o Dominic Toretto dirige em Velozes e Furiosos 1?",
-    answers: ["Toyota Supra", "Dodge Charger 1970", "Nissan Skyline", "Mazda RX-7"],
-    correct: 1
+    image: U("DeLorean DMC-12, car, classic"),
+    question: "Em 'De Volta para o Futuro', qual é o carro que vira máquina do tempo?",
+    answers: ["Pontiac Firebird", "DeLorean DMC-12", "Aston Martin DB5", "Ford Mustang"],
+    correct: 1,
+    info: "O DeLorean DMC-12, com portas asa-de-gaivota, ficou eternizado como máquina do tempo do Dr. Brown e Marty McFly."
   },
   {
-    question: "Qual carro é o famoso 'Herbie' dos filmes da Disney?",
-    answers: ["Fiat 500", "VW Fusca", "Mini Cooper", "Chevy Camaro"],
-    correct: 1
+    image: U("Dodge Charger 1970, muscle car"),
+    question: "Qual muscle car o Dominic Toretto usa em diversos filmes de 'Velozes e Furiosos'?",
+    answers: ["Dodge Charger 1970", "Chevrolet Camaro 1969", "Ford Mustang 1967", "Plymouth Barracuda 1971"],
+    correct: 0,
+    info: "O Dodge Charger R/T 1970 é o ícone do Toretto: V8 brutal e presença clássica dos muscle cars americanos."
   },
   {
-    question: "No jogo Need for Speed: Most Wanted (2005), qual é o carro principal?",
-    answers: ["Toyota Supra", "BMW M3 GTR", "Mazda RX-8", "Ford Mustang"],
-    correct: 1
+    image: U("Toyota Supra MK4, orange, JDM"),
+    question: "Qual carro laranja do Brian O'Conner ficou famoso no primeiro 'Velozes e Furiosos'?",
+    answers: ["Mazda RX-7", "Nissan Skyline R34", "Toyota Supra MK4", "Honda S2000"],
+    correct: 2,
+    info: "O Toyota Supra MK4 de Brian, com preparação pesada, virou símbolo do tuning dos anos 2000."
   },
   {
-    question: "Qual é o carro falante da série Knight Rider?",
-    answers: ["Pontiac Firebird Trans Am", "Chevrolet Corvette", "Ford Mustang", "Dodge Viper"],
-    correct: 0
+    image: U("BMW M3 GTR E46, racing"),
+    question: "No jogo 'Need for Speed: Most Wanted' (2005), qual é o carro principal do protagonista?",
+    answers: ["BMW M3 GTR", "Mitsubishi Lancer Evo", "Subaru Impreza WRX", "Mazda RX-8"],
+    correct: 0,
+    info: "A BMW M3 GTR E46, com livery branco/azul, é uma das máquinas mais queridas pelos fãs da franquia NFS."
   },
   {
-    question: "No filme 'De Volta para o Futuro', qual carro é a máquina do tempo?",
-    answers: ["Chevrolet Camaro", "DeLorean DMC-12", "Ferrari 308", "Porsche 911"],
-    correct: 1
+    image: U("Pontiac Firebird Trans Am, Knight Rider"),
+    question: "Qual modelo é o KITT, carro falante de 'Knight Rider'?",
+    answers: ["Pontiac Firebird Trans Am", "Chevrolet Corvette", "Dodge Viper", "Ford GT"],
+    correct: 0,
+    info: "KITT é um Pontiac Firebird Trans Am modificado, com tecnologia avançada e a icônica luz vermelha frontal."
   },
   {
-    question: "Qual é o carro do Batman em 'The Dark Knight'?",
-    answers: ["Batmóvel Tumbler", "Lamborghini Aventador", "Batmobile clássico", "Bugatti Chiron"],
-    correct: 0
+    image: U("Batmobile Tumbler, dark, Gotham"),
+    question: "Em 'The Dark Knight', como é chamado o Batmóvel usado por Batman?",
+    answers: ["Tumbler", "Interceptor", "Mach 5", "Speeder"],
+    correct: 0,
+    info: "O Tumbler é um Batmóvel estilo tanque, ágil e imponente, introduzido na trilogia de Christopher Nolan."
   },
   {
-    question: "No game GTA V, qual carro lembra a Lamborghini Aventador?",
-    answers: ["Adder", "Zentorno", "Entity XF", "Infernus"],
-    correct: 1
+    image: U("Chevrolet Camaro, Bumblebee, yellow"),
+    question: "Em 'Transformers', Bumblebee se transforma em qual carro moderno?",
+    answers: ["Chevrolet Camaro", "Dodge Challenger", "Ford Mustang", "Nissan GT-R"],
+    correct: 0,
+    info: "Bumblebee popularizou o Chevrolet Camaro moderno, aparecendo em várias gerações ao longo da franquia."
   },
   {
-    question: "No filme 'Cars' da Pixar, qual é o nome do protagonista?",
-    answers: ["Mate", "Doc Hudson", "Relâmpago McQueen", "Sally"],
-    correct: 2
+    image: U("Ford Falcon XB, Mad Max, Interceptor"),
+    question: "Qual é o carro Interceptor de Max em 'Mad Max'?",
+    answers: ["Ford Falcon XB", "Pontiac GTO", "Chevy Impala", "Plymouth Road Runner"],
+    correct: 0,
+    info: "O 'Pursuit Special' é um Ford Falcon XB modificado, visual bruto pós-apocalíptico, símbolo da série."
   },
   {
-    question: "Em 'Transformers', qual carro é o Bumblebee?",
-    answers: ["Chevrolet Camaro", "Ford Mustang", "Dodge Charger", "VW Fusca"],
-    correct: 0
+    image: U("Aston Martin DB5, James Bond, classic"),
+    question: "Qual clássico da Aston Martin é famoso pelos filmes de James Bond?",
+    answers: ["DB9", "DB11", "DB5", "Vantage"],
+    correct: 2,
+    info: "O Aston Martin DB5 virou sinônimo de 007 desde 'Goldfinger', com gadgets e elegância britânica."
   },
   {
-    question: "No filme 'Mad Max: Estrada da Fúria', qual carro é o Interceptor de Max?",
-    answers: ["Ford Falcon XB", "Chevy Impala", "Dodge Challenger", "Pontiac GTO"],
-    correct: 0
+    image: U("Mini Cooper, The Italian Job, city"),
+    question: "No filme 'The Italian Job' (Uma Saída de Mestre), qual carro é usado no assalto e fuga?",
+    answers: ["Audi TT", "VW Golf GTI", "Mini Cooper", "Renault Clio V6"],
+    correct: 2,
+    info: "Mini Coopers fazem as fugas coreografadas por túneis e escadas – uma vitrine de agilidade urbana."
   }
 ];
 
-// iniciar quiz
-startBtn.addEventListener("click", () => {
-  menu.classList.add("hidden");
-  quiz.classList.remove("hidden");
-  showQuestion();
-});
+// ====== UTIL ======
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-// mostrar pergunta
-function showQuestion() {
-  resetState();
+function resetTimer(){
+  clearInterval(timer);
   timeLeft = 20;
-  timerElement.innerText = `⏱ Tempo: ${timeLeft}`;
-  startTimer();
-
-  let q = questions[currentQuestion];
-  questionElement.innerText = q.question;
-
-  q.answers.forEach((answer, index) => {
-    const button = document.createElement("button");
-    button.innerText = answer;
-    button.addEventListener("click", () => selectAnswer(index));
-    answersElement.appendChild(button);
-  });
+  timerEl.textContent = `⏱ ${timeLeft}`;
+  timer = setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent = `⏱ ${timeLeft}`;
+    if(timeLeft <= 0){
+      clearInterval(timer);
+      lockAnswers(-1);
+    }
+  },1000);
 }
 
-// reset
-function resetState() {
-  clearInterval(timer);
+function clearNode(node){
+  while(node.firstChild) node.removeChild(node.firstChild);
+}
+
+// ====== FLUXO ======
+function startGame(){
+  const pool = [...ALL_QUESTIONS];
+  shuffle(pool);
+  questions = pool.slice(0, MAX_QUESTIONS);
+  currentQuestionIndex = 0;
+  score = 0;
+
+  menu.classList.add("hidden");
+  info.classList.add("hidden");
+  result.classList.add("hidden");
+  quiz.classList.remove("hidden");
+  infoBox.classList.add("hidden");
   nextBtn.classList.add("hidden");
-  answersElement.innerHTML = "";
+
+  renderQuestion();
 }
 
-// selecionar resposta
-function selectAnswer(index) {
+function renderQuestion(){
   clearInterval(timer);
-  const q = questions[currentQuestion];
-  const buttons = answersElement.querySelectorAll("button");
+  infoBox.classList.add("hidden");
+  nextBtn.classList.add("hidden");
+  clearNode(answersEl);
 
-  buttons.forEach((btn, i) => {
-    if (i === q.correct) {
-      btn.classList.add("correct");
-    }
-    if (i === index && i !== q.correct) {
-      btn.classList.add("wrong");
-    }
+  const q = questions[currentQuestionIndex];
+  qIndexEl.textContent = (currentQuestionIndex+1).toString();
+  qImage.src = q.image;
+  qImage.alt = "Imagem da pergunta";
+  questionEl.textContent = q.question;
+
+  q.answers.forEach((txt, idx)=>{
+    const btn = document.createElement("button");
+    btn.className = "answer";
+    btn.textContent = txt;
+    btn.addEventListener("click", ()=>handleAnswer(idx));
+    answersEl.appendChild(btn);
+  });
+
+  resetTimer();
+}
+
+function handleAnswer(index){
+  clearInterval(timer);
+  lockAnswers(index);
+}
+
+function lockAnswers(selectedIndex){
+  const q = questions[currentQuestionIndex];
+  const buttons = answersEl.querySelectorAll(".answer");
+
+  buttons.forEach((btn, i)=>{
+    if(i === q.correct) btn.classList.add("correct");
+    if(selectedIndex === i && i !== q.correct) btn.classList.add("wrong");
     btn.disabled = true;
   });
 
-  if (index === q.correct) {
+  if(selectedIndex === q.correct){
     score++;
+    infoBox.textContent = q.info;
+    infoBox.classList.remove("hidden");
   }
+
   nextBtn.classList.remove("hidden");
 }
 
-// timer
-function startTimer() {
-  timer = setInterval(() => {
-    timeLeft--;
-    timerElement.innerText = `⏱ Tempo: ${timeLeft}`;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      selectAnswer(-1); // não respondeu
-    }
-  }, 1000);
+function nextQuestion(){
+  currentQuestionIndex++;
+  if(currentQuestionIndex < questions.length){
+    renderQuestion();
+  }else{
+    endGame();
+  }
 }
 
-// próxima
-nextBtn.addEventListener("click", () => {
-  currentQuestion++;
-  if (currentQuestion < questions.length) {
-    showQuestion();
-  } else {
-    endQuiz();
-  }
-});
-
-// fim
-function endQuiz() {
+function endGame(){
   quiz.classList.add("hidden");
   result.classList.remove("hidden");
-  scoreText.innerText = `Você acertou ${score} de ${questions.length} perguntas!`;
+  scoreText.textContent = `Você acertou ${score} de ${questions.length} perguntas!`;
 }
+
+// ====== NAVEGAÇÃO ======
+startBtn.addEventListener("click", startGame);
+
+infoBtn.addEventListener("click", ()=>{
+  menu.classList.add("hidden");
+  info.classList.remove("hidden");
+});
+
+infoBackBtn.addEventListener("click", ()=>{
+  info.classList.add("hidden");
+  menu.classList.remove("hidden");
+});
+
+nextBtn.addEventListener("click", nextQuestion);
+
+restartBtn.addEventListener("click", ()=>{
+  startGame();
+});
