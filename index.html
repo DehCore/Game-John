@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz dos Carros</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu">
+    <h1>🚗 Quiz dos Carros 🎬🎮</h1>
+    <button id="startBtn">Iniciar</button>
+  </div>
+
+  <div id="quiz" class="hidden">
+    <div id="timer">⏱ Tempo: 20</div>
+    <div id="question"></div>
+    <div id="answers"></div>
+    <button id="nextBtn" class="hidden">Próxima</button>
+  </div>
+
+  <div id="result" class="hidden">
+    <h2>🏁 Resultado Final 🏁</h2>
+    <p id="scoreText"></p>
+    <button onclick="location.reload()">Jogar Novamente</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
