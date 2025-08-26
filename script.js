@@ -7,9 +7,7 @@ const infoBackBtn = document.getElementById("infoBackBtn");
 
 const quiz = document.getElementById("quiz");
 const timerEl = document.getElementById("timer");
-const progressEl = document.getElementById("progress");
 const qIndexEl = document.getElementById("qIndex");
-const qImage = document.getElementById("qImage");
 const questionEl = document.getElementById("question");
 const answersEl = document.getElementById("answers");
 const infoBox = document.getElementById("infoBox");
@@ -18,7 +16,6 @@ const nextBtn = document.getElementById("nextBtn");
 const result = document.getElementById("result");
 const scoreText = document.getElementById("scoreText");
 const restartBtn = document.getElementById("restartBtn");
-const homeBtn = document.getElementById("homeBtn");
 
 // ====== ESTADO ======
 let questions = [];
@@ -28,80 +25,67 @@ let timeLeft = 20;
 let timer = null;
 const MAX_QUESTIONS = 10;
 
-// Helper para gerar URLs estáveis do Unsplash Source (carrega SEMPRE uma imagem)
-const U = (q) => `https://source.unsplash.com/featured/800x450/?${encodeURIComponent(q)}`;
-
-// ====== BANCO DE PERGUNTAS (com imagens externas funcionais) ======
+// ====== PERGUNTAS (sem imagens) ======
 const ALL_QUESTIONS = [
   {
-    image: U("DeLorean DMC-12, car, classic"),
     question: "Em 'De Volta para o Futuro', qual é o carro que vira máquina do tempo?",
     answers: ["Pontiac Firebird", "DeLorean DMC-12", "Aston Martin DB5", "Ford Mustang"],
     correct: 1,
-    info: "O DeLorean DMC-12, com portas asa-de-gaivota, ficou eternizado como máquina do tempo do Dr. Brown e Marty McFly."
+    info: "O DeLorean DMC-12, com portas asa-de-gaivota, virou a máquina do tempo do Dr. Brown e do Marty."
   },
   {
-    image: U("Dodge Charger 1970, muscle car"),
-    question: "Qual muscle car o Dominic Toretto usa em diversos filmes de 'Velozes e Furiosos'?",
+    question: "Qual muscle car o Dominic Toretto usa em vários filmes de 'Velozes e Furiosos'?",
     answers: ["Dodge Charger 1970", "Chevrolet Camaro 1969", "Ford Mustang 1967", "Plymouth Barracuda 1971"],
     correct: 0,
-    info: "O Dodge Charger R/T 1970 é o ícone do Toretto: V8 brutal e presença clássica dos muscle cars americanos."
+    info: "O Dodge Charger R/T 1970 é o clássico do Toretto: V8 nervoso e visual icônico."
   },
   {
-    image: U("Toyota Supra MK4, orange, JDM"),
     question: "Qual carro laranja do Brian O'Conner ficou famoso no primeiro 'Velozes e Furiosos'?",
     answers: ["Mazda RX-7", "Nissan Skyline R34", "Toyota Supra MK4", "Honda S2000"],
     correct: 2,
-    info: "O Toyota Supra MK4 de Brian, com preparação pesada, virou símbolo do tuning dos anos 2000."
+    info: "O Toyota Supra MK4 de Brian marcou a era do tuning dos anos 2000."
   },
   {
-    image: U("BMW M3 GTR E46, racing"),
     question: "No jogo 'Need for Speed: Most Wanted' (2005), qual é o carro principal do protagonista?",
     answers: ["BMW M3 GTR", "Mitsubishi Lancer Evo", "Subaru Impreza WRX", "Mazda RX-8"],
     correct: 0,
-    info: "A BMW M3 GTR E46, com livery branco/azul, é uma das máquinas mais queridas pelos fãs da franquia NFS."
+    info: "A BMW M3 GTR E46 com livery branco/azul é um dos carros mais amados da franquia."
   },
   {
-    image: U("Pontiac Firebird Trans Am, Knight Rider"),
-    question: "Qual modelo é o KITT, carro falante de 'Knight Rider'?",
+    question: "Qual modelo é o KITT, o carro falante de 'Knight Rider'?",
     answers: ["Pontiac Firebird Trans Am", "Chevrolet Corvette", "Dodge Viper", "Ford GT"],
     correct: 0,
-    info: "KITT é um Pontiac Firebird Trans Am modificado, com tecnologia avançada e a icônica luz vermelha frontal."
+    info: "O KITT é um Pontiac Firebird Trans Am modificado, com alta tecnologia e a luz vermelha frontal."
   },
   {
-    image: U("Batmobile Tumbler, dark, Gotham"),
-    question: "Em 'The Dark Knight', como é chamado o Batmóvel usado por Batman?",
+    question: "Em 'The Dark Knight', como é chamado o Batmóvel usado pelo Batman?",
     answers: ["Tumbler", "Interceptor", "Mach 5", "Speeder"],
     correct: 0,
-    info: "O Tumbler é um Batmóvel estilo tanque, ágil e imponente, introduzido na trilogia de Christopher Nolan."
+    info: "O Tumbler é um Batmóvel estilo tanque, rápido e resistente, da trilogia do Nolan."
   },
   {
-    image: U("Chevrolet Camaro, Bumblebee, yellow"),
     question: "Em 'Transformers', Bumblebee se transforma em qual carro moderno?",
     answers: ["Chevrolet Camaro", "Dodge Challenger", "Ford Mustang", "Nissan GT-R"],
     correct: 0,
-    info: "Bumblebee popularizou o Chevrolet Camaro moderno, aparecendo em várias gerações ao longo da franquia."
+    info: "O Bumblebee popularizou o Camaro moderno, aparecendo em várias gerações."
   },
   {
-    image: U("Ford Falcon XB, Mad Max, Interceptor"),
-    question: "Qual é o carro Interceptor de Max em 'Mad Max'?",
+    question: "Qual é o carro Interceptor do Max em 'Mad Max'?",
     answers: ["Ford Falcon XB", "Pontiac GTO", "Chevy Impala", "Plymouth Road Runner"],
     correct: 0,
-    info: "O 'Pursuit Special' é um Ford Falcon XB modificado, visual bruto pós-apocalíptico, símbolo da série."
+    info: "O 'Pursuit Special' é um Ford Falcon XB modificado, símbolo do mundo pós-apocalíptico."
   },
   {
-    image: U("Aston Martin DB5, James Bond, classic"),
-    question: "Qual clássico da Aston Martin é famoso pelos filmes de James Bond?",
+    question: "Qual clássico da Aston Martin é famoso nos filmes de James Bond?",
     answers: ["DB9", "DB11", "DB5", "Vantage"],
     correct: 2,
-    info: "O Aston Martin DB5 virou sinônimo de 007 desde 'Goldfinger', com gadgets e elegância britânica."
+    info: "O Aston Martin DB5 ficou eternizado desde 'Goldfinger' pela elegância e gadgets."
   },
   {
-    image: U("Mini Cooper, The Italian Job, city"),
-    question: "No filme 'The Italian Job' (Uma Saída de Mestre), qual carro é usado no assalto e fuga?",
+    question: "No filme 'The Italian Job' (Uma Saída de Mestre), qual carro é usado na fuga?",
     answers: ["Audi TT", "VW Golf GTI", "Mini Cooper", "Renault Clio V6"],
     correct: 2,
-    info: "Mini Coopers fazem as fugas coreografadas por túneis e escadas – uma vitrine de agilidade urbana."
+    info: "Os Mini Coopers fazem fugas coreografadas por túneis e escadas, mostrando agilidade urbana."
   }
 ];
 
@@ -123,7 +107,7 @@ function resetTimer(){
     timerEl.textContent = `⏱ ${timeLeft}`;
     if(timeLeft <= 0){
       clearInterval(timer);
-      lockAnswers(-1);
+      lockAnswers(-1); // estourou o tempo
     }
   },1000);
 }
@@ -158,8 +142,6 @@ function renderQuestion(){
 
   const q = questions[currentQuestionIndex];
   qIndexEl.textContent = (currentQuestionIndex+1).toString();
-  qImage.src = q.image;
-  qImage.alt = "Imagem da pergunta";
   questionEl.textContent = q.question;
 
   q.answers.forEach((txt, idx)=>{
