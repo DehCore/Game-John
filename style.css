@@ -3,37 +3,28 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 12px;
-  color: #ffffff; /* deixa bem branco */
+  color: #ffffff; /* branco total */
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* sombra leve para destacar */
 }
 
 /* BOTÕES DE RESPOSTA */
 .answer {
-  background: #1b1f45; /* mantém o degradê escuro mas mais claro que antes */
+  background: #2c3170; /* fundo mais claro que antes */
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
   text-align: left;
   color: #ffffff; /* texto branco */
   font-weight: 600;
+  transition: background 0.2s;
 }
 
 .answer:hover {
-  background: #2c3170; /* hover mais claro */
+  background: #3a3f8f; /* hover mais claro */
+  color: #ffffff; 
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
 
-/* INFO BOX (opcional, clarear também) */
-.info-box {
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  background: #154d3c; /* mais contraste */
-  color: #ffffff; /* texto branco */
-}
-
-/* TIMER (opcional) */
-.timer {
-  background: #2c3158; /* mais contraste */
-  padding: 6px 12px;
-  border-radius: 8px;
-  color: #ffffff; /* branco */
-}
+/* CORRETAS/ERRADAS (não mudar, só aumentar contraste se quiser) */
+.correct{ background: #17623a !important; color:#fff; }
+.wrong{ background: #8a1d2f !important; color:#fff; }
