@@ -162,4 +162,9 @@ infoBtn.addEventListener("click",()=>{ menu.classList.add("hidden"); info.classL
 infoBackBtn.addEventListener("click",()=>{ info.classList.add("hidden"); menu.classList.remove("hidden"); });
 nextBtn.addEventListener("click",nextQuestion);
 restartBtn.addEventListener("click",startGame);
-homeBtn.addEventListener("click",()=>{ location.reload(); });
+
+// BOTÃO “VOLTAR AO INÍCIO” AJUSTADO
+homeBtn.addEventListener("click", () => {
+  result.classList.add("hidden"); // esconde o resultado
+  menu.classList.remove("hidden"); // mostra o menu inicial
+});
